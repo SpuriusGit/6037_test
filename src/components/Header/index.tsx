@@ -1,5 +1,3 @@
-'use client';
-
 import styles from '@/components/styles.module.scss';
 import Image from 'next/image';
 import avatar from './avatar.png';
