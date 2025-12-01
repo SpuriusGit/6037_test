@@ -2,8 +2,8 @@
 
 const nextConfig = {
     output: 'export',
-    basePath: '/6037_test',
-    assetPrefix: '/6037_test/',
+    basePath: '',
+    assetPrefix: '',
     images: {
         unoptimized: true,
     },
