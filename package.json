@@ -2,9 +2,11 @@
   "name": "genesis_test",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://SpuriusGit.github.io/6037_test/",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "deploy": "rd /s /q .next & rd /s /q out & yarn build && gh-pages -d out",
     "start": "next start",
     "lint": "eslint . --ext ts,tsx --fix",
     "format": "prettier . --write"
@@ -32,6 +34,7 @@
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
+    "gh-pages": "^6.3.0",
     "prettier": "^3.7.3",
     "prettier-plugin-organize-imports": "^4.3.0",
     "typescript": "^5"

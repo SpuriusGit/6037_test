@@ -68,7 +68,6 @@
   }
 }
 
-/* CARD */
 .card {
   background: white;
   border-radius: 24px;
@@ -89,8 +88,8 @@
 .card_header {
   display: flex;
   gap: 16px;
-  margin-bottom: 32px;
   justify-content: center;
+  margin-bottom: 30px;
 
   @media screen and (max-width: 768px) {
     justify-content: flex-start;
@@ -127,7 +126,6 @@
   }
 }
 
-/* MONTHS */
 .months {
   display: flex;
   gap: 24px;
@@ -137,32 +135,36 @@
   margin-bottom: 8px;
 }
 
-/* DAYS + TIMES ROW */
 .row {
   display: flex;
   align-items: center;
-  margin-bottom: 32px;
 }
 
-/* DAYS + TIMES LIST */
+.time_row {
+  .list {
+    height: auto;
+  }
+}
+
 .list {
   display: flex;
   gap: 8px;
   overflow-x: auto;
   padding-bottom: 4px;
   scroll-behavior: smooth;
+  height: 120px;
+  justify-content: flex-start;
+  align-items: center;
 
   &::-webkit-scrollbar {
     height: 4px;
   }
 
-  /* prevent shrinking of children */
   & > * {
     flex-shrink: 0;
   }
 }
 
-/* DAY BUTTONS */
 .day,
 .day_active {
   width: 64px;
@@ -266,4 +268,17 @@
   background: #d1d5db;
   color: white;
   border: none;
+}
+
+.day_wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.month_label {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-bottom: 6px;
+  margin-top: -25px;
 }

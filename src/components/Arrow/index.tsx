@@ -3,9 +3,9 @@
 import styles from './styles.module.scss';
 
 type ArrowProps = {
+  className?: string;
   direction: 'left' | 'right';
   onClick?: () => void;
-  className?: string;
 };
 
 export default function Arrow({ direction, onClick }: ArrowProps) {

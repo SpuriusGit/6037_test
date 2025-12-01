@@ -1,61 +1,36 @@
 'use client';
-import Arrow from '@/components/BookingCard/Arrow';
-import {
-  addDays,
-  format,
-  getTime,
-  isBefore,
-  isSameDay,
-  setHours,
-  setMinutes,
-  startOfDay,
-} from 'date-fns';
+
+import styles from '@/components/styles.module.scss';
 import Image from 'next/image';
-import { JSX, useMemo, useRef, useState } from 'react';
-import avatar from '../../../public/avatar.png';
+import { useRef } from 'react';
 import clock from '../../../public/clock.svg';
 import model from '../../../public/model.svg';
-import styles from './styles.module.scss';
 
-export default function BookingCard(): JSX.Element {
-  const today = useMemo(() => startOfDay(new Date()), []);
+import ConfirmButton from '@/components/ConfirmButton';
+import DayList from '@/components/DayList';
+import Header from '@/components/Header';
+import TimeList from '@/components/TimeList';
+import { useBookingDates } from '../../hooks/useBookingDates';
+import { useBookingTimes } from '../../hooks/useBookingTimes';
 
-  const days = useMemo(() => {
-    const arr: Date[] = [];
-    for (let i = 0; i < 6 * 7 + 1; i++) arr.push(addDays(today, i));
-    return arr;
-  }, [today]);
+export default function BookingCard() {
+  const daysRef = useRef<HTMLDivElement>(null);
+  const timesRef = useRef<HTMLDivElement>(null);
 
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [selectedTime, setSelectedTime] = useState<Date | null>(null);
+  const { days, selectedDate, selectDate, isSelected: isDaySelected } = useBookingDates();
 
-  const daysRef = useRef<HTMLDivElement | null>(null);
-  const timesRef = useRef<HTMLDivElement | null>(null);
-
-  const now = new Date();
-
-  const times = useMemo(() => {
-    if (!selectedDate) return [];
-    const list: Date[] = [];
-    const base = startOfDay(selectedDate);
-    for (let h = 0; h < 24; h++) {
-      for (let m = 0; m < 60; m += 15) {
-        list.push(setMinutes(setHours(base, h), m));
-      }
-    }
-    return list;
-  }, [selectedDate]);
-
-  const isTimeDisabled = (t: Date) => {
-    if (!selectedDate) return false;
-    if (isSameDay(selectedDate, now)) return isBefore(t, now);
-    return false;
-  };
+  const {
+    times,
+    selectedTime,
+    selectTime,
+    isDisabled,
+    isSelected: isTimeSelected,
+  } = useBookingTimes(selectedDate);
 
   const handleConfirm = () => {
     if (!selectedDate || !selectedTime) return;
-    const ts = Math.floor(getTime(selectedTime) / 1000);
-    alert('Confirmed timestamp: ' + ts);
+    const ts = Math.floor(selectedTime.getTime() / 1000);
+    alert(`Confirmed timestamp: ${ts}`);
   };
 
   return (
@@ -65,105 +40,40 @@ export default function BookingCard(): JSX.Element {
           <h1 className={styles.intro_title}>Cool session</h1>
           <p className={styles.intro_subtitle}>Additional type</p>
           <span className={styles.intro_time}>
-            {' '}
             <Image src={clock} alt="Clock" />
             30 min
           </span>
         </div>
+
         <div className={styles.intro_model}>
           <Image src={model} alt="Model" className={styles.model_image} />
         </div>
       </div>
 
       <div className={styles.card}>
-        <div className={styles.card_header}>
-          <Image src={avatar} alt="Avatar" width={120} height={120} className={styles.avatar} />
+        <Header />
 
-          <div className={styles.card_header__text}>
-            <h2>Book a Session</h2>
-            <p>Choose a date and time that is convenient for you to e-meet your stylist</p>
-          </div>
-        </div>
-
-        <div className={styles.months}>
-          <span>Sep</span>
-          <span>Oct</span>
-        </div>
-
-        <div className={styles.row}>
-          <Arrow
-            direction="left"
-            onClick={() => daysRef.current?.scrollBy({ left: -200, behavior: 'smooth' })}
-          />
-
-          <div ref={daysRef} className={styles.list}>
-            {days.map((d) => {
-              const active = selectedDate && isSameDay(d, selectedDate);
-              return (
-                <button
-                  key={d.toISOString()}
-                  onClick={() => {
-                    setSelectedDate(d);
-                    setSelectedTime(null);
-                  }}
-                  className={active ? styles.day_active : styles.day}
-                >
-                  <span className={styles.day_week}>{format(d, 'EEE')}</span>
-                  <span className={styles.day_num}>{format(d, 'd')}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          <Arrow
-            direction="right"
-            onClick={() => daysRef.current?.scrollBy({ left: 200, behavior: 'smooth' })}
-          />
-        </div>
+        <DayList
+          days={days}
+          isSelected={isDaySelected}
+          onSelect={(d) => {
+            selectDate(d);
+            selectTime(null);
+          }}
+          containerRef={daysRef}
+        />
 
         {selectedDate && (
-          <div className={styles.row}>
-            <Arrow
-              direction="left"
-              onClick={() => timesRef.current?.scrollBy({ left: -200, behavior: 'smooth' })}
-            />
-
-            <div ref={timesRef} className={styles.list}>
-              {times.map((t) => {
-                const disabled = isTimeDisabled(t);
-                const active = selectedTime && getTime(selectedTime) === getTime(t);
-
-                return (
-                  <button
-                    key={t.toISOString()}
-                    disabled={disabled}
-                    onClick={() => !disabled && setSelectedTime(t)}
-                    className={
-                      disabled ? styles.time_disabled : active ? styles.time_active : styles.time
-                    }
-                  >
-                    {format(t, 'h:mm a')}
-                  </button>
-                );
-              })}
-            </div>
-
-            <Arrow
-              direction="right"
-              onClick={() => timesRef.current?.scrollBy({ left: 200, behavior: 'smooth' })}
-            />
-          </div>
+          <TimeList
+            times={times}
+            isDisabled={isDisabled}
+            isSelected={isTimeSelected}
+            onSelect={selectTime}
+            containerRef={timesRef}
+          />
         )}
 
-        <div className={styles.confirm_wrapper}>
-          <button
-            disabled={!(selectedDate && selectedTime)}
-            onClick={handleConfirm}
-            className={selectedDate && selectedTime ? styles.confirm : styles.confirm_disabled}
-          >
-            Confirm
-          </button>
-        </div>
+        <ConfirmButton disabled={!selectedDate || !selectedTime} onConfirm={handleConfirm} />
       </div>
     </div>
   );
