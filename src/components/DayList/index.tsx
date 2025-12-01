@@ -1,8 +1,8 @@
 'use client';
-import { format } from 'date-fns';
 import Arrow from '@/components/Arrow';
 import DayButton from '@/components/DayButton';
 import styles from '@/components/styles.module.scss';
+import { format } from 'date-fns';
 import { RefObject } from 'react';
 
 interface Props {
@@ -21,21 +21,20 @@ export default function DayList({ days, isSelected, onSelect, containerRef }: Pr
       />
 
       <div ref={containerRef} className={styles.list}>
+        {days.map((d, i) => {
+          const isFirst = i === 0 || d.getDate() === 1;
+          const monthLabel = isFirst ? format(d, 'MMM') : null;
 
-          {days.map((d, i) => {
-              const isFirst = i === 0 || d.getDate() === 1;
-              const monthLabel = isFirst ? format(d, 'MMM') : null;
-
-              return (
-                  <DayButton
-                      key={d.toISOString()}
-                      date={d}
-                      active={isSelected(d)}
-                      onClick={() => onSelect(d)}
-                      showMonthLabel={monthLabel}
-                  />
-              );
-          })}
+          return (
+            <DayButton
+              key={d.toISOString()}
+              date={d}
+              active={isSelected(d)}
+              onClick={() => onSelect(d)}
+              showMonthLabel={monthLabel}
+            />
+          );
+        })}
       </div>
 
       <Arrow
